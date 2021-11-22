@@ -4,47 +4,65 @@ repos:
 - repo: git://github.com/pre-commit/pre-commit-hooks
   rev: v4.0.1
   hooks:
+  # whitespace
   - id: trailing-whitespace
-  - id: check-added-large-files
+  - id: end-of-file-fixer
+  - id: mixed-line-ending
+    args: ['--fix=lf']
+    exclude: '.*\.(svg)$'
+  - id: check-byte-order-marker
+  # file format and permissions
   - id: check-ast
   - id: check-json
-  - id: check-merge-conflict
   - id: check-xml
   - id: check-yaml
+    files: .*\.(yaml|yml)$
+  - id: check-executables-have-shebangs
+  - id: check-shebang-scripts-are-executable
+  # git
+  - id: check-shebang-scripts-are-executable
+  - id: check-added-large-files
+  - id: check-case-conflict
+  # python
   - id: debug-statements
-  - id: end-of-file-fixer
+  - id: check-docstring-first
+  - id: name-tests-test
   - id: requirements-txt-fixer
-  - id: mixed-line-ending
-    args: ['--fix=auto']  # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
+  - id: double-quote-string-fixer
+  - id: fix-encoding-pragma
 
-## If you want to avoid flake8 errors due to unused vars or imports:
-# - repo: https://github.com/myint/autoflake.git
-#   rev: v1.4
-#   hooks:
-#   - id: autoflake
-#     args: [
-#       --in-place,
-#       --remove-all-unused-imports,
-#       --remove-unused-variables,
-#     ]
 
 - repo: https://github.com/pycqa/isort
   rev: 5.9.3
   hooks:
   - id: isort
 
-- repo: https://github.com/psf/black
-  rev: stable
+- repo: https://github.com/Lucas-C/pre-commit-hooks
+  rev: v1.1.7
   hooks:
-  - id: black
-    language_version: python3
+    - id: remove-tabs
+      exclude: '.*\.(svg)$'
 
-## If like to embrace black styles even in the docs:
-# - repo: https://github.com/asottile/blacken-docs
-#   rev: v1.11.0
-#   hooks:
-#   - id: blacken-docs
-#     additional_dependencies: [black]
+- repo: https://github.com/pre-commit/mirrors-autopep8
+  rev: 'v1.5.7'
+  hooks:
+    - id: autopep8
+
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.7.0
+  hooks:
+    - id: bandit
+
+#- repo: https://github.com/tox-dev/tox-ini-fmt
+#  rev: 0.5.1
+#  hooks:
+#    - id: tox-ini-fmt
+
+- repo: https://opendev.org/openstack/bashate
+  rev: 2.0.0
+  hooks:
+    - id: bashate
+      args: ["--max-line-length", "150"]
 
 - repo: https://github.com/PyCQA/flake8
   rev: 4.0.1
