@@ -23,6 +23,7 @@ repos:
   - id: check-shebang-scripts-are-executable
   - id: check-added-large-files
   - id: check-case-conflict
+  - id: detect-private-key
   # python
   - id: debug-statements
   - id: check-docstring-first
@@ -53,10 +54,10 @@ repos:
   hooks:
     - id: bandit
 
-#- repo: https://github.com/tox-dev/tox-ini-fmt
-#  rev: 0.5.1
-#  hooks:
-#    - id: tox-ini-fmt
+- repo: https://github.com/tox-dev/tox-ini-fmt
+  rev: 0.5.1
+  hooks:
+    - id: tox-ini-fmt
 
 - repo: https://opendev.org/openstack/bashate
   rev: 2.1.0
