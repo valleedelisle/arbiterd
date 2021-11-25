@@ -4,16 +4,16 @@
 
 import os
 import typing as ty
-import unittest
 from unittest import mock
 
 import testtools
 
 from arbiterd.common import filesystem
+from arbiterd_tests import base
 from arbiterd_tests import fixtures as at_fixtures
 
 
-class TestFSCommon(unittest.TestCase):
+class TestFSCommon(testtools.TestCase):
 
     def test_get_sys_fs_mount(self):
         mtab_data = 'sysfs /sys'
@@ -69,3 +69,7 @@ class TestFSTestData(testtools.TestCase):
         self.assertTrue(os.path.exists(fs_fixture.sys_path))
         self.assertIs(filesystem.get_sys_fs_mount, fs_fixture.sys_mock)
         self.assertEqual(fs_fixture.sys_path, filesystem.get_sys_fs_mount())
+
+
+class TestCPUData(base.ATTestCase):
+    pass
