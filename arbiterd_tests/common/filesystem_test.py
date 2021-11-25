@@ -2,13 +2,15 @@
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
 
-
 import os
 import typing as ty
 import unittest
 from unittest import mock
 
+import testtools
+
 from arbiterd.common import filesystem
+from arbiterd_tests import fixtures as at_fixtures
 
 
 class TestFSCommon(unittest.TestCase):
@@ -46,7 +48,7 @@ class TestFSCommon(unittest.TestCase):
         self.assertEqual(data, {1, 2, 3, 4})
 
 
-class TestFSTestData(unittest.TestCase):
+class TestFSTestData(testtools.TestCase):
 
     def test_import_test_data(self):
         import arbiterd_tests.test_data as td
@@ -59,3 +61,11 @@ class TestFSTestData(unittest.TestCase):
         self.assertTrue(os.path.exists(data_path_base))
         sys_path = os.path.join(data_path_base, filesystem.SYS)
         self.assertTrue(os.path.exists(sys_path))
+
+    def test_sysfs_fixture(self):
+        fs_fixture = at_fixtures.SYSFileSystemFixture()
+        self.useFixture(fs_fixture)
+        self.assertTrue(os.path.exists(fs_fixture.temp_dir))
+        self.assertTrue(os.path.exists(fs_fixture.sys_path))
+        self.assertIs(filesystem.get_sys_fs_mount, fs_fixture.sys_mock)
+        self.assertEqual(fs_fixture.sys_path, filesystem.get_sys_fs_mount())
