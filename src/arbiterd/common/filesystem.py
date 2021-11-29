@@ -75,14 +75,61 @@ def parse_cpu_spec(spec: str) -> ty.Set[int]:
     return cpuset_ids
 
 
+def read_sys(
+        path: str, sys: str = None, default: str = None
+) -> ty.Optional[str]:
+    sys = sys or get_sys_fs_mount()
+    try:
+        with open(os.path.join(sys, path), mode='r') as data:
+            return data.read()
+    except (OSError, ValueError):
+        pass
+    return default
+
+
+def readlines_sys(path: str, sys: str = None) -> ty.List[str]:
+    sys = sys or get_sys_fs_mount()
+    try:
+        with open(os.path.join(sys, path), mode='r') as data:
+            return data.readlines()
+    except (OSError, ValueError):
+        pass
+    return []
+
+# TODO move to cpu module.
+
+
 AVAILABLE_PATH = 'devices/system/cpu/present'
 
 
 def get_available_cpus() -> ty.Set[int]:
+    return parse_cpu_spec(read_sys(AVAILABLE_PATH)) or set()
+
+
+ONLINE_PATH = 'devices/system/cpu/online'
+
+
+def get_online_cpus() -> ty.Set[int]:
+    return parse_cpu_spec(read_sys(ONLINE_PATH)) or set()
+
+
+OFFLINE_PATH = 'devices/system/cpu/offline'
+
+
+def get_offline_cpus() -> ty.Set[int]:
+    return parse_cpu_spec(read_sys(OFFLINE_PATH)) or set()
+
+
+def nproc() -> int:
+    return len(get_available_cpus())
+
+
+def gen_cpu_paths() -> ty.List[str]:
     sys = get_sys_fs_mount()
-    try:
-        with open(os.path.join(sys, AVAILABLE_PATH), mode='r') as present:
-            return parse_cpu_spec(present.read())
-    except (OSError, ValueError):
-        pass
-    return set()
+    for core in range(nproc()):
+        yield str(os.path.join(sys, f'devices/system/cpu/cpu{core}'))
+
+
+def get_online(cpu_path: str) -> bool:
+    online = read_sys(os.path.join(cpu_path, 'online'), default='1').strip()
+    return online == '1'
