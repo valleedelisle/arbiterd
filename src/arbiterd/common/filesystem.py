@@ -2,14 +2,17 @@
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
 
+import functools
 import os
 import typing as ty
 
 SYS = '/sys'
 SYSFS = 'sysfs'
 MTAB = '/etc/mtab'
+ETC = '/etc'
 
 
+@functools.lru_cache
 def get_sys_fs_mount() -> str:
     """find the default sysfs mount point"""
     try:
@@ -27,6 +30,11 @@ def get_sys_fs_mount() -> str:
         # TODO: add logging
         pass
     return SYS
+
+
+@functools.lru_cache
+def get_etc_fs_mount() -> str:
+    return ETC
 
 
 def read_sys(

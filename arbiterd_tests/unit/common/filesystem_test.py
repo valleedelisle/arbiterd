@@ -13,11 +13,24 @@ from arbiterd_tests import fixtures as at_fixtures
 
 class TestFSCommon(testtools.TestCase):
 
+    def setUp(self):
+        super().setUp()
+        # clear all cached functions in setup to avoid
+        # inter test interactions.
+        filesystem.get_sys_fs_mount.cache_clear()
+        filesystem.get_etc_fs_mount.cache_clear()
+
+    def test_get_etc_fs_mount(self):
+        self.assertEqual(filesystem.ETC, filesystem.get_etc_fs_mount())
+
     def test_get_sys_fs_mount(self):
         mtab_data = 'sysfs /sys'
         open_mock = mock.mock_open(read_data=mtab_data)
         with mock.patch('builtins.open', open_mock) as m_open:
             self.assertEqual(filesystem.SYS, filesystem.get_sys_fs_mount())
+            # this function should be cached so calling it again should not
+            # result in a second read.
+            filesystem.get_sys_fs_mount()
             m_open.assert_called_once()
 
     def test_get_sys_fs_mount_raises(self):
