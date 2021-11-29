@@ -10,12 +10,24 @@ from arbiterd_tests import fixtures as at_fixtures
 
 
 class ATTestCase(testtools.TestCase):
+    USE_ETC_FIXTURE = True
+    USE_SYS_FIXTURE = True
+    USE_LOG_FIXTURE = True
 
     def setUp(self):
         super().setUp()
-        self.etc_fixture = self.useFixture(at_fixtures.ETCFileSystemFixture())
-        self.sys_fixture = self.useFixture(at_fixtures.SYSFileSystemFixture())
-        self.log_fixture = self.useFixture(fixtures.FakeLogger())
+        self.etc_fixture = (
+            self.useFixture(at_fixtures.ETCFileSystemFixture())
+            if self.USE_ETC_FIXTURE else None
+        )
+        self.sys_fixture = (
+            self.useFixture(at_fixtures.SYSFileSystemFixture())
+            if self.USE_SYS_FIXTURE else None
+        )
+        self.log_fixture = (
+            self.useFixture(fixtures.FakeLogger())
+            if self.USE_LOG_FIXTURE else None
+        )
         # clear all cached functions in setup to avoid
         # inter test interactions.
         filesystem.get_sys_fs_mount.cache_clear()

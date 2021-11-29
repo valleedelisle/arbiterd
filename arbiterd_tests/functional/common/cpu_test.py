@@ -15,6 +15,8 @@ class TestCPUData(base.ATTestCase):
     # This is a functional test class that use the sysfs test fixture
     # to create a fake copy of /sys which it the used in the tests.
 
+    USE_ETC_FIXTURE = False
+
     def test_available_cpus(self):
         # the sysfs test fixture has 48 cores
         cpus = cpu.get_available_cpus()
@@ -68,6 +70,8 @@ class TestCPUData(base.ATTestCase):
 class TestNovaData(base.ATTestCase):
     # This is a functional test class that use the etc test fixture
     # to create a fake copy of /etc which it the used in the tests.
+
+    USE_SYS_FIXTURE = False
 
     def setUp(self):
         super().setUp()

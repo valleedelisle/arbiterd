@@ -16,13 +16,22 @@ SYS = 'sys'
 ETC = 'etc'
 
 
-class SYSFileSystemFixture(fixtures.Fixture):
+class TEMPFileSystemFixture(fixtures.Fixture):
+    """Creates a fake / filesystem"""
+
+    def _setUp(self):
+        if not hasattr(self, 'temp_dir'):
+            self.temp_dir = tempfile.mkdtemp(prefix='arbiterd_tests')
+            self.addCleanup(shutil.rmtree, self.temp_dir, ignore_errors=True)
+
+
+class SYSFileSystemFixture(TEMPFileSystemFixture):
     """Creates a fake /sys filesystem"""
 
     def _setUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix='arbiterd_tests')
-        self.addCleanup(shutil.rmtree, self, 'temp_dir')
+        super()._setUp()
         self.sys_path = os.path.join(self.temp_dir, SYS)
+        self.addCleanup(shutil.rmtree, self.sys_path, ignore_errors=True)
         shutil.copytree(
             os.path.join(DATA_PATH_BASE, SYS),
             self.sys_path, symlinks=True,
@@ -35,13 +44,13 @@ class SYSFileSystemFixture(fixtures.Fixture):
         self.addCleanup(sys_patcher.stop)
 
 
-class ETCFileSystemFixture(fixtures.Fixture):
-    """Creates a fake /ETC filesystem"""
+class ETCFileSystemFixture(TEMPFileSystemFixture):
+    """Creates a fake /etc filesystem"""
 
     def _setUp(self):
-        self.temp_dir = tempfile.mkdtemp(prefix='arbiterd_tests')
-        self.addCleanup(shutil.rmtree, self, 'temp_dir')
+        super()._setUp()
         self.etc_path = os.path.join(self.temp_dir, ETC)
+        self.addCleanup(shutil.rmtree, self.etc_path, ignore_errors=True)
         shutil.copytree(
             os.path.join(DATA_PATH_BASE, ETC),
             self.etc_path, symlinks=True,
