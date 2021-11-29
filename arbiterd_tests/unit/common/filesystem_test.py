@@ -3,14 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-import typing as ty
 from unittest import mock
 
 import testtools
-from testtools.content import text_content
 
 from arbiterd.common import filesystem
-from arbiterd_tests import base
 from arbiterd_tests import fixtures as at_fixtures
 
 
@@ -43,11 +40,6 @@ class TestFSCommon(testtools.TestCase):
             self.assertEqual(filesystem.SYS, filesystem.get_sys_fs_mount())
             m_open.assert_called_once()
 
-    def test_parse_cpu_spec(self):
-        data = filesystem.parse_cpu_spec('1-4')
-        self.assertIsInstance(data, ty.Set)
-        self.assertEqual(data, {1, 2, 3, 4})
-
 
 class TestFSTestData(testtools.TestCase):
 
@@ -70,58 +62,3 @@ class TestFSTestData(testtools.TestCase):
         self.assertTrue(os.path.exists(fs_fixture.sys_path))
         self.assertIs(filesystem.get_sys_fs_mount, fs_fixture.sys_mock)
         self.assertEqual(fs_fixture.sys_path, filesystem.get_sys_fs_mount())
-
-# This is a functional test class that use the sysfs test fixture
-# to create a fake copy of /sys which it the used in the tests.
-
-
-class TestCPUData(base.ATTestCase):
-
-    # the sysfs test fixture has 48 cores
-    def test_available_cpus(self):
-        cpus = filesystem.get_available_cpus()
-        self.assertEqual({x for x in range(48)}, cpus)
-    # all cores are online
-
-    def test_online_cpus(self):
-        cpus = filesystem.get_online_cpus()
-        self.assertEqual({x for x in range(48)}, cpus)
-    # so the offline cpus should be empty
-
-    def test_offline_cpus(self):
-        cpus = filesystem.get_offline_cpus()
-        self.assertEqual(set(), cpus)
-    # the total amount of cpus should be the union of the online
-    # and offline cpus.
-
-    def test_available_equals_online_and_offline(self):
-        self.assertEqual(
-            filesystem.get_available_cpus(),
-            {*filesystem.get_online_cpus(), *filesystem.get_offline_cpus()}
-        )
-    # the total number of cpus should be 48
-
-    def test_nproc(self):
-        self.assertEqual(filesystem.nproc(), 48)
-    # the per cpu paths should exist within the sys mount
-
-    def test_gen_cpu_paths(self):
-        sys = filesystem.get_sys_fs_mount()
-        expected = []
-        for core in range(48):
-            path = os.path.join(sys, f'devices/system/cpu/cpu{core}')
-            self.assertTrue(os.path.exists(path))
-            expected.append(str(path))
-        self.assertEqual(list(filesystem.gen_cpu_paths()), expected)
-    # and each cpu should report itself as online.
-
-    def test_get_online(self):
-        for cpu in filesystem.gen_cpu_paths():
-            self.addDetail(
-                f'cpu-online path={cpu}',
-                text_content(
-                    filesystem.read_sys(os.path.join(cpu, 'online')) or
-                    'not present')
-            )
-            self.assertTrue(
-                filesystem.get_online(cpu), f'cpu:{cpu} is offline')
