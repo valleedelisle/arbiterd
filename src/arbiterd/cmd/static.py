@@ -7,7 +7,7 @@ import logging
 import os
 from pprint import PrettyPrinter
 
-from arbiterd.common import cpu
+from arbiterd.common import cpu, libvirt
 
 LOG = logging.getLogger(__name__)
 PRINTER = PrettyPrinter()
@@ -19,6 +19,15 @@ pformat = PRINTER.pformat
 # errors, warnings and debug info will be logged.
 # The default logging config logs at warn level and above.
 # The default handler of last resort writes to sys.stderr
+
+
+libvirt_obj = None
+
+
+def init_libvirt():
+    global libvirt_obj
+    if libvirt_obj is None:
+        libvirt_obj = libvirt.Libvirt()
 
 
 def list_command(args):
@@ -33,6 +42,14 @@ def list_command(args):
         pprint(f'Dedicated CPUs: {cpu.get_dedicated_cpus(args.nova_config)}')
     elif args.shared_cpus:
         pprint(f'Shared CPUs: {cpu.get_shared_cpus(args.nova_config)}')
+    elif args.domains:
+        init_libvirt()
+        domains = [
+            (dom.name(), dom.UUIDString(),
+             {idx: cpus for idx, cpus in enumerate(dom.vcpuPinInfo())})
+            for dom in libvirt_obj.list_domains()
+        ]
+        pprint(f'Libvirt Domains: {domains}')
     else:
         # TBD: add support for listing  vcpu_pin_set from nova.conf.
         # TODO: add summary view.
@@ -75,6 +92,7 @@ def run():
     list_group.add_argument('--offline-cpus', action='store_true')
     list_group.add_argument('--dedicated-cpus', action='store_true')
     list_group.add_argument('--shared-cpus', action='store_true')
+    list_group.add_argument('--domains', action='store_true')
     list_parser.set_defaults(func=list_command)
 
     args = parser.parse_args()

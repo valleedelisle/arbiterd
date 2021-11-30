@@ -1,0 +1,119 @@
+<domain type="qemu">
+   <uuid>daadd5d4-faad-43f7-b9b2-31b38de75a5a</uuid>uuid>
+   <name>instance-00000056</name>name>
+   <memory>131072</memory>memory>
+   <vcpu>4</vcpu>vcpu>
+   <metadata>
+     <nova:instance xmlns:nova="http://openstack.org/xmlns/libvirt/nova/1.1">
+       <nova:package version="24.1.0"/>>
+       <nova:name>tempest-DeleteServersTestJSON-server-317152214</nova:name>nova:name>
+       <nova:creationTime>2021-11-29 19:48:20</nova:creationTime>nova:creationTime>
+       <nova:flavor name="m1.nano">
+         <nova:memory>128</nova:memory>nova:memory>
+         <nova:disk>1</nova:disk>nova:disk>
+         <nova:swap>0</nova:swap>nova:swap>
+         <nova:ephemeral>0</nova:ephemeral>nova:ephemeral>
+         <nova:vcpus>4</nova:vcpus>nova:vcpus>
+       </nova:flavor>nova:flavor>
+       <nova:owner>
+         <nova:user uuid="80515d2c96c743f681df324bbed7cf80">tempest-DeleteServersTestJSON-28754310-project</nova:user>nova:user>
+         <nova:project uuid="5c77afa3f8624b6e9741ddec04d110da">tempest-DeleteServersTestJSON-28754310</nova:project>nova:project>
+       </nova:owner>nova:owner>
+       <nova:root type="image" uuid="b13a045e-a10d-4d44-b8b5-f4e0d403eb99"/>
+       <nova:ports>
+         <nova:port uuid="5729c9a2-e642-41ba-880c-b35c8f06946a">
+           <nova:ip type="fixed" address="10.1.0.3" ipVersion="4"/>
+         </nova:port>nova:port>
+       </nova:ports>nova:ports>
+     </nova:instance>nova:instance>
+   </metadata>metadata>
+   <sysinfo type="smbios">
+     <system>
+       <entry name="manufacturer">OpenStack Foundation</entry>entry>
+       <entry name="product">OpenStack Nova</entry>entry>
+       <entry name="version">24.1.0</entry>entry>
+       <entry name="serial">daadd5d4-faad-43f7-b9b2-31b38de75a5a</entry>entry>
+       <entry name="uuid">daadd5d4-faad-43f7-b9b2-31b38de75a5a</entry>entry>
+       <entry name="family">Virtual Machine</entry>entry>
+     </system>system>
+   </sysinfo>sysinfo>
+   <os>
+     <type machine="q35">hvm</type>type>
+     <boot dev="hd"/>
+     <smbios mode="sysinfo"/>
+   </os>os>
+   <features>
+     <acpi/>
+     <vmcoreinfo/>
+   </features>features>
+   <cputune>
+       <shares>1024</shares>shares>
+       <vcpupin vcpu="0" cpuset="1,13,25,37"/>
+       <vcpupin vcpu="1" cpuset="4"/>
+       <vcpupin vcpu="2" cpuset="5"/>
+       <vcpupin vcpu="3" cpuset="6"/>
+   </cputune>cputune>
+   <clock offset="utc"/>
+   <cpu mode="custom" match="exact">
+     <model>Nehalem</model>model>
+     <topology sockets="1" cores="2" threads="2"/>
+   </cpu>cpu>
+   <devices>
+     <disk type="file" device="disk">
+       <driver name="qemu" type="qcow2" cache="none"/>
+       <source file="/opt/stack/data/nova/instances/daadd5d4-faad-43f7-b9b2-31b38de75a5a/disk"/>
+       <target dev="vda" bus="virtio"/>
+     </disk>disk>
+     <disk type="file" device="cdrom">
+       <driver name="qemu" type="raw" cache="none"/>
+       <source file="/opt/stack/data/nova/instances/daadd5d4-faad-43f7-b9b2-31b38de75a5a/disk.config"/>
+       <target dev="sda" bus="sata"/>
+     </disk>disk>
+     <interface type="ethernet">
+       <mac address="fa:16:3e:70:8c:00"/>
+       <model type="virtio"/>
+       <driver name="qemu"/>
+       <mtu size="1380"/>
+       <target dev="tap5729c9a2-e6"/>
+     </interface>interface>
+     <serial type="pty">
+       <log file="/opt/stack/data/nova/instances/daadd5d4-faad-43f7-b9b2-31b38de75a5a/console.log" append="off"/>
+     </serial>serial>
+     <graphics type="vnc" autoport="yes" listen="0.0.0.0"/>
+     <video>
+       <model type="virtio"/>
+     </video>video>
+     <rng model="virtio">
+       <backend model="random">/dev/urandom</backend>backend>
+     </rng>rng>
+     <controller type="pci" model="pcie-root"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="pci" model="pcie-root-port"/>
+     <controller type="usb" index="0" model="none"/>
+     <memballoon model="virtio">
+       <stats period="10"/>
+     </memballoon>memballoon>
+   </devices>devices>
+ </domain>
