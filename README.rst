@@ -27,17 +27,35 @@
     :alt: Project generated with PyScaffold
     :target: https://pyscaffold.org/
 
+.. image:: https://img.shields.io/badge/security-bandit-yellow.svg
+    :target: https://github.com/PyCQA/bandit
+    :alt: Security Status
+
+.. image:: https://github.com/SeanMooney/arbiterd/actions/workflows/tox.yml/badge.svg
+    :target: https://github.com/SeanMooney/arbiterd/actions/workflows/tox.yml/badge.svg
+    :alt: Tox CI Status
+
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+   :target: https://github.com/pre-commit/pre-commit
+   :alt: pre-commit
+
+.. image:: https://readthedocs.org/projects/arbiterd/badge/?version=latest
+   :alt: ReadTheDocs
+   :target: https://arbiterd.readthedocs.io/en/stable/
 |
 
 ========
-arbiterd
+Arbiterd
 ========
 
 
-    Add a short description here!
+    Arbiterd - power and performance arbiter daemon
 
 
-A longer description of your project goes here...
+Arbiterd is a work in progress python daemon for the management
+of server power usage and performance with integration with OpenStack-nova.
+
+Arbiterd is currently pre-alpha in the early stages of bootstrapping and should not be used in any production environment.
 
 
 .. _pyscaffold-notes:
@@ -59,6 +77,8 @@ It is a good idea to update the hooks to the latest version::
 Don't forget to tell your contributors to also install and use pre-commit.
 
 .. _pre-commit: https://pre-commit.com/
+
+This project uses tox to execute tests, build docs and automate other development task that are not suitable for automation via pre-commit.
 
 Note
 ====
