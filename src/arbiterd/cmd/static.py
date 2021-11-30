@@ -37,7 +37,7 @@ def list_command(args):
     elif args.online_cpus:
         pprint(f'Online CPUs: {cpu.get_online_cpus()}')
     elif args.offline_cpus:
-        pprint(f'Online CPUs: {cpu.get_online_cpus()}')
+        pprint(f'Offline CPUs: {cpu.get_offline_cpus()}')
     elif args.dedicated_cpus:
         pprint(f'Dedicated CPUs: {nova.get_dedicated_cpus(args.nova_config)}')
     elif args.shared_cpus:
@@ -45,8 +45,7 @@ def list_command(args):
     elif args.domains:
         init_libvirt()
         domains = [
-            (dom.name(), dom.UUIDString(),
-             {idx: cpus for idx, cpus in enumerate(dom.vcpuPinInfo())})
+            (dom.name(), dom.UUIDString())
             for dom in libvirt_obj.list_domains()
         ]
         pprint(f'Libvirt Domains: {domains}')
@@ -57,6 +56,48 @@ def list_command(args):
         # VMs on the host.
         # TODO: add support for listing kernel and userspace isolated cpus
         LOG.error(pformat(f'list was called with unsupported agrs: {args}'))
+        fail(args)
+
+
+def show_command(args):
+    try:
+        if args.domain_by_name:
+            init_libvirt()
+            domain = libvirt_obj.get_domain_by_name(args.domain_by_name)
+            print(f'Libvirt Domains:\n{domain.XMLDesc(0)}')
+        elif args.domain_by_uuid:
+            init_libvirt()
+            domain = libvirt_obj.get_domain_by_uuid(args.domain_by_uuid)
+            print(f'Libvirt Domains:\n{domain.XMLDesc(0)}')
+        elif args.cpu_state is not None:
+            path = cpu.gen_cpu_path(args.cpu_state)
+            online = cpu.get_online(path)
+            print('ONLINE' if online else 'OFFLINE')
+        else:
+            LOG.error(
+                pformat(f'show was called with unsupported agrs: {args}'))
+            fail(args)
+    except ValueError as e:
+        LOG.error(e)
+        fail(args)
+
+
+def set_command(args):
+    try:
+        if args.cpu_online is not None:
+            path = cpu.gen_cpu_path(args.cpu_online)
+            if not cpu.set_online(path):
+                fail(args)
+        elif args.cpu_offline is not None:
+            path = cpu.gen_cpu_path(args.cpu_offline)
+            if not cpu.set_offline(path):
+                fail(args)
+        else:
+            LOG.error(
+                pformat(f'show was called with unsupported agrs: {args}'))
+    except ValueError as e:
+        LOG.error(e)
+        fail(args)
 
 
 def validate_gobal_configs(args):
@@ -72,6 +113,11 @@ def validate_gobal_configs(args):
     return result
 
 
+def fail(args, code=1):
+    LOG.debug(f'Command Failed {args}')
+    exit(code)
+
+
 def run():
 
     parser = argparse.ArgumentParser(description='Static CPU Arbiter')
@@ -82,6 +128,9 @@ def run():
     parser.add_argument(
         '--no-config', dest='no_config', action='store_true', default=False,
         help='skip config loading')
+    parser.add_argument(
+        '--debug', dest='debug', action='store_true', default=False,
+        help='enable debug_logging')
 
     sub_commands = parser.add_subparsers()
 
@@ -95,7 +144,39 @@ def run():
     list_group.add_argument('--domains', action='store_true')
     list_parser.set_defaults(func=list_command)
 
+    show_parser = sub_commands.add_parser('show')
+    show_group = show_parser.add_mutually_exclusive_group(required=True)
+    show_group.add_argument(
+        '--domain-by-name', type=str, help='The libvirt instance name')
+    show_group.add_argument(
+        '--domain-by-uuid', type=str, help='The libvirt instance uuid')
+    show_group.add_argument(
+        '--cpu-state', type=int, help='The online state of  cpu #',
+        default=None
+    )
+    show_parser.set_defaults(func=show_command)
+
+    set_parser = sub_commands.add_parser('set')
+    set_group = set_parser.add_mutually_exclusive_group(required=True)
+    set_group.add_argument(
+        '--cpu-online', type=int, help='The online state of  cpu #',
+        default=None
+    )
+    set_group.add_argument(
+        '--cpu-offline', type=int, help='The online state of  cpu #',
+        default=None
+    )
+    set_parser.set_defaults(func=set_command)
+
     args = parser.parse_args()
+    # TODO: support external log config.
+    if args.debug:
+        logging.basicConfig(
+            format=(
+                '%(asctime)s,%(msecs)d %(levelname)-8s '
+                '[%(filename)s:%(lineno)d] %(message)s'
+            ),
+            datefmt='%Y-%m-%d:%H:%M:%S', level=logging.DEBUG)
     if not args.no_config and not validate_gobal_configs(args):
         return
     if 'func' in args:

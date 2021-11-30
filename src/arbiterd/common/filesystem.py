@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import functools
+import logging
 import os
 import typing as ty
 
@@ -10,6 +11,8 @@ SYS = '/sys'
 SYSFS = 'sysfs'
 MTAB = '/etc/mtab'
 ETC = '/etc'
+
+LOG = logging.getLogger(__name__)
 
 
 @functools.lru_cache
@@ -37,23 +40,30 @@ def get_etc_fs_mount() -> str:
     return ETC
 
 
-def read_sys(
-        path: str, sys: str = None, default: str = None
-) -> ty.Optional[str]:
-    sys = sys or get_sys_fs_mount()
+def read_sys(path: str, default: str = None) -> ty.Optional[str]:
+    sys = get_sys_fs_mount()
     try:
         with open(os.path.join(sys, path), mode='r') as data:
             return data.read()
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError) as e:
+        LOG.debug(e)
     return default
 
 
-def readlines_sys(path: str, sys: str = None) -> ty.List[str]:
-    sys = sys or get_sys_fs_mount()
+def readlines_sys(path: str) -> ty.List[str]:
+    sys = get_sys_fs_mount()
     try:
         with open(os.path.join(sys, path), mode='r') as data:
             return data.readlines()
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError) as e:
+        LOG.debug(e)
     return []
+
+
+def write_sys(path: str, data: str = None) -> ty.Optional[str]:
+    sys = get_sys_fs_mount()
+    try:
+        with open(os.path.join(sys, path), mode='w') as fd:
+            fd.write(data)
+    except (OSError, ValueError) as e:
+        LOG.debug(e)

@@ -34,7 +34,7 @@ class TestLibvirt(testtools.TestCase):
         mock_init.return_value = None
         libvirt_obj = libvirt.Libvirt()
         libvirt_obj.get_connection()
-        mock_libvirt.open.assert_called_once()
+        mock_libvirt.openReadOnly.assert_called_once()
 
     @mock.patch.object(libvirt.Libvirt, 'import_libvirt')
     @mock.patch.object(libvirt.Libvirt, 'get_connection')

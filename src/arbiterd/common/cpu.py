@@ -2,10 +2,14 @@
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
 
+
+import logging
 import os
 import typing as ty
 
 from arbiterd.common import filesystem
+
+LOG = logging.getLogger(__name__)
 
 
 def parse_cpu_spec(spec: str) -> ty.Set[int]:
@@ -82,6 +86,10 @@ CPU_PATH_TEMPLATE = 'devices/system/cpu/cpu'
 
 
 def gen_cpu_path(core: int) -> str:
+    if not exists(core):
+        err = ValueError(f'CPU: {core} does not exist')
+        LOG.debug(f'attempt to access cpu: {core}, error: {err}')
+        raise err
     sys = filesystem.get_sys_fs_mount()
     return str(os.path.join(sys, f'{CPU_PATH_TEMPLATE}{core}'))
 
@@ -92,7 +100,27 @@ def gen_cpu_paths() -> ty.Iterable[str]:
         yield str(os.path.join(sys, f'{CPU_PATH_TEMPLATE}{core}'))
 
 
+def exists(cpu: int) -> bool:
+    return cpu in get_available_cpus()
+
+
 def get_online(cpu_path: str) -> bool:
     online = filesystem.read_sys(
         os.path.join(cpu_path, 'online'), default='1').strip()
     return online == '1'
+
+
+def set_online(cpu_path: str) -> bool:
+    online = get_online(cpu_path)
+    if online:
+        return True
+    filesystem.write_sys(os.path.join(cpu_path, 'online'), data='1')
+    return get_online(cpu_path)
+
+
+def set_offline(cpu_path: str) -> bool:
+    online = get_online(cpu_path)
+    if not online:
+        return True
+    filesystem.write_sys(os.path.join(cpu_path, 'online'), data='0')
+    return not get_online(cpu_path)

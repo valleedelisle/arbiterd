@@ -25,9 +25,15 @@ class Libvirt(object):
 
     def get_connection(self) -> ty.Optional:
         try:
-            return libvirt.open('qemu:///system')
+            return libvirt.openReadOnly('qemu:///system')
         except libvirt.libvirtError:
             return None
 
     def list_domains(self) -> ty.Iterable:
         return self.conn.listAllDomains(0)
+
+    def get_domain_by_name(self, name: str) -> 'libvirt.virDomain':
+        return self.conn.lookupByName(name)
+
+    def get_domain_by_uuid(self, uuid: str) -> 'libvirt.virDomain':
+        return self.conn.lookupByUUID(uuid)
