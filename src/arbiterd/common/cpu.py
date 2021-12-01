@@ -2,8 +2,6 @@
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
 
-import configparser
-import functools
 import os
 import typing as ty
 
@@ -80,53 +78,21 @@ def nproc() -> int:
     return len(get_available_cpus())
 
 
+CPU_PATH_TEMPLATE = 'devices/system/cpu/cpu'
+
+
 def gen_cpu_path(core: int) -> str:
     sys = filesystem.get_sys_fs_mount()
-    return str(os.path.join(sys, f'devices/system/cpu/cpu{core}'))
+    return str(os.path.join(sys, f'{CPU_PATH_TEMPLATE}{core}'))
 
 
 def gen_cpu_paths() -> ty.Iterable[str]:
     sys = filesystem.get_sys_fs_mount()
     for core in range(nproc()):
-        yield str(os.path.join(sys, f'devices/system/cpu/cpu{core}'))
+        yield str(os.path.join(sys, f'{CPU_PATH_TEMPLATE}{core}'))
 
 
 def get_online(cpu_path: str) -> bool:
     online = filesystem.read_sys(
         os.path.join(cpu_path, 'online'), default='1').strip()
     return online == '1'
-
-
-# TODO move nova functions to nova.py
-@functools.lru_cache
-def parse_nova_conf(nova_conf: str) -> configparser.ConfigParser:
-    config = configparser.ConfigParser(interpolation=None)
-    config.read(nova_conf)
-    return config
-
-
-def get_string(
-        conf: configparser.ConfigParser, section, option, default=None,
-        strip=True
-) -> str:
-
-    data = conf.get(section, option, fallback=default)
-    if data is not None and strip:
-        data = data.strip('"').strip('\'')
-    return data
-
-
-def get_dedicated_cpus(nova_conf: str) -> ty.Set[int]:
-    nova = parse_nova_conf(nova_conf)
-    data = get_string(nova, 'compute', 'cpu_dedicated_set')
-    if data is None:
-        return set()
-    return parse_cpu_spec(data)
-
-
-def get_shared_cpus(nova_conf: str) -> ty.Set[int]:
-    nova = parse_nova_conf(nova_conf)
-    data = get_string(nova, 'compute', 'cpu_shared_set')
-    if data is None:
-        return set()
-    return parse_cpu_spec(data)

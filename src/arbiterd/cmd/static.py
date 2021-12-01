@@ -7,7 +7,7 @@ import logging
 import os
 from pprint import PrettyPrinter
 
-from arbiterd.common import cpu, libvirt
+from arbiterd.common import cpu, libvirt, nova
 
 LOG = logging.getLogger(__name__)
 PRINTER = PrettyPrinter()
@@ -39,9 +39,9 @@ def list_command(args):
     elif args.offline_cpus:
         pprint(f'Online CPUs: {cpu.get_online_cpus()}')
     elif args.dedicated_cpus:
-        pprint(f'Dedicated CPUs: {cpu.get_dedicated_cpus(args.nova_config)}')
+        pprint(f'Dedicated CPUs: {nova.get_dedicated_cpus(args.nova_config)}')
     elif args.shared_cpus:
-        pprint(f'Shared CPUs: {cpu.get_shared_cpus(args.nova_config)}')
+        pprint(f'Shared CPUs: {nova.get_shared_cpus(args.nova_config)}')
     elif args.domains:
         init_libvirt()
         domains = [
