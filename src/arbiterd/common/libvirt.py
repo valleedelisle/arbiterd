@@ -9,6 +9,14 @@ libvirt = None
 
 LIBVIRT_URI = 'qemu:///system'
 
+libvirt_obj = None
+
+
+def init_libvirt():
+    global libvirt_obj
+    if libvirt_obj is None:
+        libvirt_obj = Libvirt()
+
 
 class Libvirt(object):
 
@@ -36,4 +44,4 @@ class Libvirt(object):
         return self.conn.lookupByName(name)
 
     def get_domain_by_uuid(self, uuid: str) -> 'libvirt.virDomain':
-        return self.conn.lookupByUUID(uuid)
+        return self.conn.lookupByUUIDString(uuid)

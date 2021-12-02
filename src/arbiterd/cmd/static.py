@@ -8,6 +8,7 @@ import os
 from pprint import PrettyPrinter
 
 from arbiterd.common import cpu, libvirt, nova
+from arbiterd.objects import instance
 
 LOG = logging.getLogger(__name__)
 PRINTER = PrettyPrinter()
@@ -19,15 +20,6 @@ pformat = PRINTER.pformat
 # errors, warnings and debug info will be logged.
 # The default logging config logs at warn level and above.
 # The default handler of last resort writes to sys.stderr
-
-
-libvirt_obj = None
-
-
-def init_libvirt():
-    global libvirt_obj
-    if libvirt_obj is None:
-        libvirt_obj = libvirt.Libvirt()
 
 
 def list_command(args):
@@ -43,12 +35,20 @@ def list_command(args):
     elif args.shared_cpus:
         pprint(f'Shared CPUs: {nova.get_shared_cpus(args.nova_config)}')
     elif args.domains:
-        init_libvirt()
+        libvirt.init_libvirt()
         domains = [
             (dom.name(), dom.UUIDString())
-            for dom in libvirt_obj.list_domains()
+            for dom in libvirt.libvirt_obj.list_domains()
         ]
         pprint(f'Libvirt Domains: {domains}')
+    elif args.nova_domains:
+        libvirt.init_libvirt()
+        instances = []
+        for dom in libvirt.libvirt_obj.list_domains():
+            inst = instance.Instance.from_domain(dom)
+            if inst.is_nova_instance:
+                instances.append((inst.name, inst.uuid))
+        pprint(f'Libvirt Domains: {instances}')
     else:
         # TBD: add support for listing  vcpu_pin_set from nova.conf.
         # TODO: add summary view.
@@ -62,13 +62,13 @@ def list_command(args):
 def show_command(args):
     try:
         if args.domain_by_name:
-            init_libvirt()
-            domain = libvirt_obj.get_domain_by_name(args.domain_by_name)
-            print(f'Libvirt Domains:\n{domain.XMLDesc(0)}')
+            libvirt.init_libvirt()
+            obj = instance.Instance(name=args.domain_by_name)
+            print(f'Libvirt Domains:\n{obj.xml_str}')
         elif args.domain_by_uuid:
-            init_libvirt()
-            domain = libvirt_obj.get_domain_by_uuid(args.domain_by_uuid)
-            print(f'Libvirt Domains:\n{domain.XMLDesc(0)}')
+            libvirt.init_libvirt()
+            obj = instance.Instance(uuid=args.domain_by_uuid)
+            print(f'Libvirt Domains:\n{obj.xml_str}')
         elif args.cpu_state is not None:
             path = cpu.gen_cpu_path(args.cpu_state)
             online = cpu.get_online(path)
@@ -142,6 +142,7 @@ def run():
     list_group.add_argument('--dedicated-cpus', action='store_true')
     list_group.add_argument('--shared-cpus', action='store_true')
     list_group.add_argument('--domains', action='store_true')
+    list_group.add_argument('--nova-domains', action='store_true')
     list_parser.set_defaults(func=list_command)
 
     show_parser = sub_commands.add_parser('show')
