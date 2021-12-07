@@ -1,6 +1,6 @@
 <domain type="qemu">
    <uuid>daadd5d4-faad-43f7-b9b2-31b38de75a5a</uuid>uuid>
-   <name>instance-00000056</name>name>
+   <name>nova-vm</name>name>
    <memory>131072</memory>memory>
    <vcpu>4</vcpu>vcpu>
    <metadata>

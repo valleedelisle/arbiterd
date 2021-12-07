@@ -7,13 +7,16 @@ import logging
 import os
 from pprint import PrettyPrinter
 
+from arbiterd import dispatcher
 from arbiterd.common import cpu, libvirt, nova
-from arbiterd.objects import instance
+from arbiterd.objects import context, hardware_thread, instance
 
 LOG = logging.getLogger(__name__)
 PRINTER = PrettyPrinter()
 pprint = PRINTER.pprint
 pformat = PRINTER.pformat
+
+DISPATCHER = None
 
 # TODO: decide on output convention.
 # currently normal out is reported with pprint but
@@ -69,6 +72,10 @@ def show_command(args):
             libvirt.init_libvirt()
             obj = instance.Instance(uuid=args.domain_by_uuid)
             print(f'Libvirt Domains:\n{obj.xml_str}')
+        elif args.domain_affinity:
+            libvirt.init_libvirt()
+            obj = instance.Instance(name=args.domain_affinity)
+            print(f'Libvirt Domains:\n{obj.cpu_affinities}')
         elif args.cpu_state is not None:
             path = cpu.gen_cpu_path(args.cpu_state)
             online = cpu.get_online(path)
@@ -92,6 +99,44 @@ def set_command(args):
             path = cpu.gen_cpu_path(args.cpu_offline)
             if not cpu.set_offline(path):
                 fail(args)
+        else:
+            LOG.error(
+                pformat(f'show was called with unsupported agrs: {args}'))
+    except ValueError as e:
+        LOG.error(e)
+        fail(args)
+
+
+def arbitrate_command(args):
+    try:
+        ctx = context.Context()
+        ctx.dry_run = not args.apply
+        if args.cpu_state:
+            ctx.managed_hardware_threads = [
+                hardware_thread.HardwareThread(ident=core)
+                for core in nova.get_dedicated_cpus(args.nova_config)
+            ]
+            ctx.instances = []
+            libvirt.init_libvirt()
+            for dom in libvirt.libvirt_obj.list_domains():
+                inst = instance.Instance.from_domain(dom)
+                if inst.is_nova_instance:
+                    ctx.instances.append(inst)
+            print(DISPATCHER.arbitrate('cpu-state', ctx))
+        else:
+            LOG.error(
+                pformat(f'show was called with unsupported agrs: {args}'))
+    except ValueError as e:
+        LOG.error(e)
+        fail(args)
+
+
+def revoke_command(args):
+    try:
+        ctx = context.Context()
+        ctx.dry_run = not args.apply
+        if args.cpu_state:
+            print(DISPATCHER.revoke('cpu-state', ctx))
         else:
             LOG.error(
                 pformat(f'show was called with unsupported agrs: {args}'))
@@ -152,6 +197,9 @@ def run():
     show_group.add_argument(
         '--domain-by-uuid', type=str, help='The libvirt instance uuid')
     show_group.add_argument(
+        '--domain-affinity', type=str,
+        help='The cpu of the libvirt instance by name')
+    show_group.add_argument(
         '--cpu-state', type=int, help='The online state of  cpu #',
         default=None
     )
@@ -169,6 +217,40 @@ def run():
     )
     set_parser.set_defaults(func=set_command)
 
+    arbitrate_parser = sub_commands.add_parser(
+        'arbitrate', help=(
+            'The arbitrte command will execute the selected arbiter '
+            'In dry run mode by default unless --apply is specified.'
+        ))
+    arbitrate_group = arbitrate_parser.add_mutually_exclusive_group(
+        required=True)
+    arbitrate_group.add_argument(
+        '--cpu-state', action='store_true', default=False,
+        help='Automatically manage the cpu online state'
+    )
+    arbitrate_parser.add_argument(
+        '--apply', type=int,
+        help='apply the changes to the host.'
+    )
+
+    arbitrate_parser.set_defaults(func=arbitrate_command)
+    revoke_parser = sub_commands.add_parser(
+        'revoke', help=(
+            'The revoke command will execute the selected arbiter '
+            'In dry run mode by default unless --apply is specified.'
+        ))
+
+    revoke_group = revoke_parser.add_mutually_exclusive_group(required=True)
+    revoke_group.add_argument(
+        '--cpu-state', action='store_true', default=False,
+        help='revoke management of the cpu online state'
+    )
+    revoke_parser.add_argument(
+        '--apply', type=int,
+        help='apply the changes to the host.'
+    )
+    revoke_parser.set_defaults(func=revoke_command)
+
     args = parser.parse_args()
     # TODO: support external log config.
     if args.debug:
@@ -180,6 +262,13 @@ def run():
             datefmt='%Y-%m-%d:%H:%M:%S', level=logging.DEBUG)
     if not args.no_config and not validate_gobal_configs(args):
         return
+
+    # we initalise DISPATCHER after parsing so we can account
+    # for the --debug flag.
+    # TODO move this to separate function
+    global DISPATCHER
+    DISPATCHER = dispatcher.Dispatcher()
+
     if 'func' in args:
         args.func(args)
     else:
