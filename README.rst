@@ -42,6 +42,7 @@
 .. image:: https://readthedocs.org/projects/arbiterd/badge/?version=latest
    :alt: ReadTheDocs
    :target: https://arbiterd.readthedocs.io/en/stable/
+
 |
 
 ========
