@@ -2,7 +2,7 @@ exclude: '^docs/conf.py'
 
 repos:
 - repo: git://github.com/pre-commit/pre-commit-hooks
-  rev: v4.0.1
+  rev: v4.1.0
   hooks:
   # whitespace
   - id: trailing-whitespace
@@ -44,7 +44,7 @@ repos:
       exclude: '.*\.(svg)$'
 
 - repo: https://github.com/pre-commit/mirrors-autopep8
-  rev: 'v1.5.7'
+  rev: 'v1.6.0'
   hooks:
     - id: autopep8
 
@@ -54,7 +54,7 @@ repos:
     - id: bandit
 
 - repo: https://github.com/tox-dev/tox-ini-fmt
-  rev: 0.5.1
+  rev: 0.5.2
   hooks:
     - id: tox-ini-fmt
 
