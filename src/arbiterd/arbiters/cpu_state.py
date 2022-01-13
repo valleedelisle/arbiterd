@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 
-import typeing as ty
+import typing as ty
 from arbiterd.arbiters import base
 from arbiterd.objects import context as ctx
 from arbiterd.objects import hardware_thread
