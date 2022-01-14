@@ -2,8 +2,8 @@
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
 import logging
-
 import typing as ty
+
 from arbiterd.arbiters import base
 from arbiterd.objects import context as ctx
 from arbiterd.objects import hardware_thread
@@ -26,10 +26,14 @@ class CPUStateArbiter(base.ArbiterBase):
         if context.dry_run:
             return f'offlinable_cpus: {offlinable_cores}'
 
-        for core in offlinable_cores:
+        offlinable_threads = {
+            t for t in context.managed_hardware_threads
+            if t.ident in offlinable_cores
+        }
+        for thread in offlinable_threads:
             logging.debug(
-                f'offlining core: {core} as part of cpu_state arbitration')
-            hardware_thread.HardwareThread(ident=core).online = False
+                f'offlining core: {thread} as part of cpu_state arbitration')
+            thread.online = False
 
         return f'offlined cpus: {offlinable_cores}'
 
@@ -50,10 +54,16 @@ class CPUStateArbiter(base.ArbiterBase):
 
         if context.dry_run:
             return f'onlinable_cpus: {onlinable_cores}'
-        for core in onlinable_cores:
-            logging.debug(f'onlining core: {core} as part of cpu_state revoke')
-            hardware_thread.HardwareThread(ident=core).online = True
-        return 'onlined: {onlinable_cores}'
+        onlinable_threads = {
+            t for t in context.managed_hardware_threads
+            if t.ident in onlinable_cores
+        }
+        for thread in onlinable_threads:
+            logging.debug(
+                f'onlining core: {thread.ident} as part of cpu_state revoke'
+            )
+            thread.online = True
+        return 'onlined cpus: {onlinable_cores}'
 
 
 def register(current_arbiters: dict) -> None:

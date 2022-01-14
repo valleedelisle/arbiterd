@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from importlib.metadata import PackageNotFoundError, version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version
 
 try:
     # Change here if project is renamed and does not equal the package name

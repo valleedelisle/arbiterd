@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
-
 import os
 from unittest import mock
 
 import testtools
-
 from arbiterd.common import filesystem
+
 from arbiterd_tests import fixtures as at_fixtures
 
 

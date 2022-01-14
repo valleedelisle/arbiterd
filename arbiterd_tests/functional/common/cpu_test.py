@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
-
 import os
 
+from arbiterd.common import cpu
+from arbiterd.common import filesystem
 from testtools.content import text_content
 
-from arbiterd.common import cpu, filesystem
 from arbiterd_tests import base
 
 

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
-
 import collections
 import typing as ty
 from dataclasses import dataclass
 
+from arbiterd.common import cpu
+from arbiterd.common import libvirt
 from defusedxml import ElementTree as ET
-
-from arbiterd.common import cpu, libvirt
 
 # TODO: extract this so it can be shared
 CPUAffinity = collections.namedtuple(

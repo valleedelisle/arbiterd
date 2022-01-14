@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
-
 import argparse
 import logging
 import os
 from pprint import PrettyPrinter
 
 from arbiterd import dispatcher
-from arbiterd.common import cpu, libvirt, nova
-from arbiterd.objects import context, hardware_thread, instance
+from arbiterd.common import cpu
+from arbiterd.common import libvirt
+from arbiterd.common import nova
+from arbiterd.objects import context
+from arbiterd.objects import hardware_thread
+from arbiterd.objects import instance
 
 LOG = logging.getLogger(__name__)
 PRINTER = PrettyPrinter()
