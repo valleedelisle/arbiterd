@@ -29,10 +29,10 @@ class HardwareThread:
 
     @property
     def online(self) -> bool:
-        return self.get_online(self.path)
+        return cpu.get_online(self.path)
 
     @online.setter
-    def online(self, state: bool) -> bool:
+    def online(self, state: bool) -> None:
         if state:
-            return cpu.set_online(self.path)
-        return cpu.set_offline(self.path)
+            cpu.set_online(self.path)
+        cpu.set_offline(self.path)

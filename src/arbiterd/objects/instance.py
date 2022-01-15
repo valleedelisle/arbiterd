@@ -11,7 +11,7 @@ from defusedxml import ElementTree as ET
 
 # TODO: extract this so it can be shared
 CPUAffinity = collections.namedtuple(
-    'CPUAaffinity', ['vcpu', 'vcpupin', 'emulatorpin', 'iothreadpin'])
+    'CPUAffinity', ['vcpu', 'vcpupin', 'emulatorpin', 'iothreadpin'])
 
 
 @dataclass
@@ -38,7 +38,7 @@ class Instance:
         return self._xml_str
 
     @property
-    def xml(self) -> str:
+    def xml(self) -> ET:
         if self._xml is None:
             self._xml = ET.fromstring(self.domain.XMLDesc(0))
         return self._xml

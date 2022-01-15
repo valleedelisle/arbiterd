@@ -19,3 +19,7 @@ class ArbiterBase(abc.ABC):
     @abc.abstractmethod
     def revoke(self, context: ctx.Context) -> str:
         raise NotImplementedError
+
+
+def register(current_arbiters: dict) -> None:
+    pass

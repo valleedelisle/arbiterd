@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import typing as ty
+from dataclasses import dataclass
 
 from arbiterd.arbiters import base
 from arbiterd.objects import context as ctx
@@ -12,6 +13,7 @@ from arbiterd.objects import hardware_thread
 LOG = logging.getLogger(__name__)
 
 
+@dataclass
 class CPUStateArbiter(base.ArbiterBase):
     TYPE: str = 'cpu-state'
 
