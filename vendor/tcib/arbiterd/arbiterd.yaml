@@ -4,7 +4,7 @@
 ---
 # we need a base contaienr with libvirtd and the nova user defiend so that
 # file permssions for the nova.conf are correct so use nova-libvirt?
-tcib_from:  trunk.registry.rdoproject.org/tripleomastercentos9/openstack-nova-libvirt:225284cc98fe16f89585f5d4e6b9bc96
+tcib_from:  quay.io/tripleomastercentos9/openstack-nova-libvirt:86f3dae907057e946a93f187b256cb6c
 tcib_actions:
   - user: root
   - run: adduser -Urm -G libvirt,nova arbiterd
