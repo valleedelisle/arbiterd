@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+# Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
+# SPDX-License-Identifier: Apache-2.0
+---
+# we need a base contaienr with libvirtd and the nova user defiend so that
+# file permssions for the nova.conf are correct so use nova-libvirt?
+tcib_from: quay.io/tripleomaster/openstack-nova-libvirt:current-tripleo
+tcib_actions:
+  - user: root
+  - run: dnf install -y python38
+  - run: adduser -Ur  -G libvirt,nova arbiterd
+  - run: mkdir -m 770 /opt/arbiterd
+  - run: chown arbiterd:arbiterd /opt/arbiterd
+  - user: arbiterd
+  - run: mkdir -p -m 660 /opt/arbiterd/etc/nova
+  - run: mkdir -p -m 660 /opt/arbiterd/etc/arbiterd
+  # we might be able to pip install the package directly without creating a virtual env
+  # however installing in a venv is likely less error prone since, we also need python 3.8+
+  - run: python3.8 -m venv /opt/arbiterd/venv
+  - run: export PATH=/opt/arbiterd/bin:$PATH && python3.8 -m pip install arbiterd
+tcib_user: arbiterd
+tcib_entrypoint: arbiterd-static --nova-config /opt/arbiterd/etc/nova/nova.conf --arbitrate cpu-state
