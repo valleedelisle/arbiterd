@@ -1,0 +1,19 @@
+# -*- coding: utf-8 -*-
+# Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
+# SPDX-License-Identifier: Apache-2.0
+---
+# we need a base contaienr with libvirtd and the nova user defiend so that
+# file permssions for the nova.conf are correct so use nova-libvirt?
+tcib_from:  quay.io/tripleomastercentos9/openstack-nova-compute:86f3dae907057e946a93f187b256cb6c
+tcib_actions:
+  - user: root
+  - run: adduser -Urm -G libvirt,nova arbiterd
+  - run: mkdir -m 770 /opt/arbiterd
+  - run: dnf install -y python3-pip
+  - run: chown arbiterd:arbiterd /opt/arbiterd
+  - user: arbiterd
+  - run: mkdir -p -m 660 /opt/arbiterd/etc/nova
+  - run: mkdir -p -m 660 /opt/arbiterd/etc/arbiterd
+  - run: pip install arbiterd
+tcib_user: arbiterd
+tcib_entrypoint: arbiterd-static --nova-config /opt/arbiterd/etc/nova/nova.conf --arbitrate cpu-state
