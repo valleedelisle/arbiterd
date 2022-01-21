@@ -4,4 +4,4 @@
 ---
 container_images:
   - image_source: tripleo
-    imagename: arbiterd:latest
+    imagename: nova-libvirt-arbiterd:latest
