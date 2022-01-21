@@ -36,3 +36,6 @@ class HardwareThread:
         if state:
             cpu.set_online(self.path)
         cpu.set_offline(self.path)
+
+    def __hash__(self):
+        return hash(self.ident)

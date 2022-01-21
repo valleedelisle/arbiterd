@@ -232,7 +232,7 @@ def run():
         help='Automatically manage the cpu online state'
     )
     arbitrate_parser.add_argument(
-        '--apply', type=int,
+        '--apply', action='store_true', default=False,
         help='apply the changes to the host.'
     )
 
@@ -249,7 +249,7 @@ def run():
         help='revoke management of the cpu online state'
     )
     revoke_parser.add_argument(
-        '--apply', type=int,
+        '--apply', action='store_true', default=False,
         help='apply the changes to the host.'
     )
     revoke_parser.set_defaults(func=revoke_command)
