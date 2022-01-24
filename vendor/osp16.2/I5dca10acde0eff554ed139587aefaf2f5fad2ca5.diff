@@ -1,0 +1,77 @@
+From 6ad8ac32c2fb48e1812c0eb241d39500b6b741e8 Mon Sep 17 00:00:00 2001
+From: Sean Mooney <work@seanmooney.info>
+Date: Thu, 09 Dec 2021 14:35:26 +0000
+Subject: [PATCH] [WIP] allow cpus to be externally managed
+
+This change adds a new cpu_externally_managed config option
+to the libvirt section. This will disable checking the online
+state of cpus used by nova so that the online state can be externally
+managed. This will allow operators to disable cpus to save power
+when there host is "full". In many telco enviornment or other static
+clouds a host can be "full" as it will not have enough space to schedule
+new workload but may still have some cores unused. This change will
+allow them to disabel those cores to save power.
+
+with this change the nova.virt.libvirt.hosts.get_online_cpus
+reports all cpus that are avilable as online if the new config option is set.
+
+Change-Id: I5dca10acde0eff554ed139587aefaf2f5fad2ca5
+---
+
+diff --git a/nova/conf/libvirt.py b/nova/conf/libvirt.py
+index 199cc6c..e111fa5 100644
+--- a/nova/conf/libvirt.py
++++ b/nova/conf/libvirt.py
+@@ -631,6 +631,13 @@
+ * cpu_mode
+ * cpu_models
+ """),
++    cfg.BoolOpt('cpu_external_management',
++                default=False,
++                help="""
++Set this to true to instuct nova that the online state and cpu governers
++are externally managed. defaults to false.
++"""),
++
+     cfg.StrOpt('snapshots_directory',
+                default='$instances_path/snapshots',
+                help='Location where libvirt driver will store snapshots '
+diff --git a/nova/tests/unit/virt/libvirt/test_host.py b/nova/tests/unit/virt/libvirt/test_host.py
+index 192909d..fd98a0f 100644
+--- a/nova/tests/unit/virt/libvirt/test_host.py
++++ b/nova/tests/unit/virt/libvirt/test_host.py
+@@ -1052,6 +1052,19 @@
+              'iowait': 6121490000000},
+             stats)
+
++    @mock.patch.object(fakelibvirt.virConnect, "getCPUMap")
++    def test_get_online_cpus(self, mock_map):
++        mock_map.return_value = (4, [True, True, False, False], None)
++        result = self.host.get_online_cpus()
++        self.assertEqual(result, {0, 1})
++
++    @mock.patch.object(fakelibvirt.virConnect, "getCPUMap")
++    def test_get_online_cpus_external_managed(self, mock_map):
++        self.flags(cpu_external_management=True, group='libvirt')
++        mock_map.return_value = (4, [True, True, False, False], None)
++        result = self.host.get_online_cpus()
++        self.assertEqual(result, {0, 1, 2, 3})
++
+     @mock.patch.object(fakelibvirt.virConnect, "defineXML")
+     def test_write_instance_config(self, mock_defineXML):
+         fake_dom_xml = """
+diff --git a/nova/virt/libvirt/host.py b/nova/virt/libvirt/host.py
+index 5c39dd3..b8efb03 100644
+--- a/nova/virt/libvirt/host.py
++++ b/nova/virt/libvirt/host.py
+@@ -745,7 +745,9 @@
+
+         online_cpus = set()
+         for cpu in range(cpus):
+-            if cpu_map[cpu]:
++            # if the cpu state is externally managed report all available
++            # CPUs as online.
++            if cpu_map[cpu] or CONF.libvirt.cpu_external_management:
+                 online_cpus.add(cpu)
+
+         return online_cpus
