@@ -47,6 +47,7 @@ docs/_rst/*
 docs/_build/*
 cover/*
 MANIFEST
+tools/ooo-tcib/output/
 
 # Per-project virtualenvs
 .venv*/

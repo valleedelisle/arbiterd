@@ -9,7 +9,6 @@ tcib_actions:
   - run: mkdir -m 770 /etc/arbiterd
   - run: dnf install -y python3-pip
   - run: chown arbiterd:arbiterd /etc/arbiterd
-  - user: arbiterd
+  # install as root so it is a system wide install not user install
   - run: pip install arbiterd
-tcib_user: arbiterd
-tcib_entrypoint: arbiterd-static --nova-config /etc/nova/nova.conf --arbitrate cpu-state
+  - user: arbiterd
