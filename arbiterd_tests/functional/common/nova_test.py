@@ -18,8 +18,6 @@ class TestNovaData(base.ATTestCase):
 
     def setUp(self):
         super().setUp()
-        # clear all cached functions.
-        nova.parse_nova_conf.cache_clear()
         self.nova_file = os.path.join(
             filesystem.get_etc_fs_mount(), 'nova/nova.conf')
 

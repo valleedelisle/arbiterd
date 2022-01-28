@@ -2,13 +2,11 @@
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
 import configparser
-import functools
 import typing as ty
 
 from arbiterd.common import cpu
 
 
-@functools.lru_cache
 def parse_nova_conf(nova_conf: str) -> configparser.ConfigParser:
     config = configparser.ConfigParser(interpolation=None)
     config.read(nova_conf)

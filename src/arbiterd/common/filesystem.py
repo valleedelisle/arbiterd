@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2021 - 2021, Sean Mooney and the arbiterd contributors
 # SPDX-License-Identifier: Apache-2.0
-import functools
 import logging
 import os
 import typing as ty
@@ -14,7 +13,6 @@ ETC = '/etc'
 LOG = logging.getLogger(__name__)
 
 
-@functools.lru_cache
 def get_sys_fs_mount() -> str:
     """find the default sysfs mount point"""
     try:
@@ -34,7 +32,6 @@ def get_sys_fs_mount() -> str:
     return SYS
 
 
-@functools.lru_cache
 def get_etc_fs_mount() -> str:
     return ETC
 
