@@ -1,7 +1,7 @@
 ## Applying the arbiterd patch to nova-compute image
 
 While the TCIB process isn't yet supported and documented in Red Hat Openstack Platform 16.x, it's possible to modify images using the
-`tripleo-modify-image` role during the `tripleo container image prepare` phase of a deployment, as described (here)[https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.2/html/transitioning_to_containerized_services/obtaining-container-images#modifying-container-images-with-a-custom-dockerfile].
+`tripleo-modify-image` role during the `tripleo container image prepare` phase of a deployment, as described [here](https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.2/html/transitioning_to_containerized_services/obtaining-container-images#modifying-container-images-with-a-custom-dockerfile).
 
 We've provided a sample configuration file based on upstream deployments but that should be similar downstrean.
 
@@ -13,9 +13,7 @@ We've provided a sample configuration file based on upstream deployments but tha
 [stack@undercloud-0 ~]$ git clone https://github.com/SeanMooney/arbiterd.git
 ```
 
-2. Modify the `containers-prepare-parameter.yaml` to exclude the `nova-compute` container from the default config and including it in a new config section.
-
-Here's a difference of the changes that need to be included:
+2. Modify the `containers-prepare-parameter.yaml` to exclude the `nova-compute` container from the default config and including it in a new config section. Here's a difference of the changes that need to be included:
 
 ```
 diff containers-prepare-parameter.yaml containers-prepare-parameter-sample.yaml
