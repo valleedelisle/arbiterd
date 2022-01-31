@@ -2,41 +2,41 @@ parameter_defaults:
   ContainerImagePrepare:
   - push_destination: true
     set:
-      ceph_alertmanager_image: alertmanager
-      ceph_alertmanager_namespace: quay.ceph.io/prometheus
-      ceph_alertmanager_tag: v0.16.2
-      ceph_grafana_image: grafana
-      ceph_grafana_namespace: quay.ceph.io/app-sre
-      ceph_grafana_tag: 6.7.4
-      ceph_image: daemon
-      ceph_namespace: quay.io/ceph
-      ceph_node_exporter_image: node-exporter
-      ceph_node_exporter_namespace: quay.ceph.io/prometheus
-      ceph_node_exporter_tag: v0.17.0
-      ceph_prometheus_image: prometheus
-      ceph_prometheus_namespace: quay.ceph.io/prometheus
-      ceph_prometheus_tag: v2.7.2
-      ceph_tag: v6.0.4-stable-6.0-pacific-centos-8-x86_64
-      name_prefix: openstack-
+      ceph_alertmanager_image: openshift-ose-prometheus-alertmanager
+      ceph_alertmanager_namespace: my-container.registry.domain.com:5002/rh-osbs
+      ceph_alertmanager_tag: v4.1
+      ceph_grafana_image: rhceph-3-dashboard-rhel7
+      ceph_grafana_namespace: registry.access.redhat.com/rhceph
+      ceph_grafana_tag: 3
+      ceph_image: rhceph
+      ceph_namespace: registry-proxy.engineering.redhat.com/rh-osbs
+      ceph_node_exporter_image: openshift-ose-prometheus-node-exporter
+      ceph_node_exporter_namespace: my-container.registry.domain.com:5002/rh-osbs
+      ceph_node_exporter_tag: v4.1
+      ceph_prometheus_image: openshift-ose-prometheus
+      ceph_prometheus_namespace: my-container.registry.domain.com:5002/rh-osbs
+      ceph_prometheus_tag: v4.1
+      ceph_tag: 4-59
+      name_prefix: rhosp16-openstack-
       name_suffix: ''
-      namespace: quay.io/tripleomastercentos9
+      namespace: my-container.registry.domain.com:5002/rh-osbs
       neutron_driver: ovn
       rhel_containers: false
-      tag: current-tripleo
-    tag_from_label: rdo_version
+      tag: 16.2
     excludes:
       - "nova-compute:"
   - push_destination: true
     includes:
       - "nova-compute:"
     set:
-      name_prefix: openstack-
+      name_prefix: rhosp16-openstack-
       name_suffix: ''
       rhel_containers: false
-      tag: current-tripleo
-      namespace: quay.io/tripleomastercentos9
+      tag: 16.2
+      namespace: my-container.registry.domain.com:5002/rh-osbs
     modify_role: tripleo-modify-image
     modify_append_tag: "-arbiterd"
     modify_vars:
       tasks_from: modify_image.yml
-      modify_dir_path: /home/stack/nova-arbiterd
+      modify_dir_path: /home/stack/arbiterd/vendor/osp16.2/
+      yum_repos_dir_path: /etc/yum.repos.d

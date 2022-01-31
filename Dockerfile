@@ -1,6 +1,6 @@
-
 FROM python:3.8-alpine
-COPY dist/arbiterd*.whl /opt/arbiterd/
+RUN mkdir -p /opt/arbiterd
+COPY / /opt/arbiterd
 RUN apk add --no-cache --virtual build-deps libvirt-dev python3-dev pkgconfig \
-  gcc build-base musl-dev  &&  python3.8 -m pip install /opt/arbiterd/arbiterd*.whl \
+  gcc git build-base musl-dev  &&  python3.8 -m pip install /opt/arbiterd/ \
   && apk del build-deps && apk add --no-cache libvirt-libs
